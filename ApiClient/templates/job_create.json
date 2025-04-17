@@ -1,0 +1,10 @@
+[
+  {
+    "Name": "<?JobName:Sample Job>",
+    "ScheduleType": "Immediate",
+    "Description": "This is a sample job",
+    "IsNotify": false,
+    "JobSteps": [<?JobStep:[{"ContractId":168016577,"ShouldAbort":true},{"ContractId":168001176,"ShouldAbort":false}]>],
+    "RunOn": "<TODAY>"
+  }
+]

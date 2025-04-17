@@ -1,0 +1,8 @@
+{
+  "ExecutionOrder": "<INDEX>",
+  "AbortOnFailure": <?ShouldAbort>,
+  "Task": {
+    "Id": <?ContractId>
+  }
+
+}

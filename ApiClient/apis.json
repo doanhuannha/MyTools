@@ -1,0 +1,89 @@
+{
+  "enviroments": [
+    {
+      "name": "DEV",
+      "root": "https://localhost:1234",
+      "credential": {
+        "locker": "dev-001",
+        "key": "[protected::8f/8MTDvE90gAv3t7u/dvA==]"
+      }
+    },
+    {
+      "name": "PROD",
+      "root": "https://dev-world.net",
+      "credential": {
+        "locker": "svc-user-001",
+        "key": "[protected::WUA9fV1KWj+AOzw9Kwo=]"
+      }
+    },
+    {
+      "name": "Tax",
+      "root": "https://dev-world.net",
+      "credential": {
+        "locker": "tax-user",
+        "key": "[protected::WUA9fV1KWj+AOzw9Kwo=]"
+      },
+      "group":  "tax"
+    },
+    {
+      "name": "Weather Forecast V1",
+      "root": "https://api.open-meteo.com",
+      "group": "weather"
+    }
+  ],
+  "apis": [
+    {
+      "name": "Create a job",
+      "description": "Create a daily job",
+      "url": "/api/job/create",
+      "method": "POST",
+      "template": "templates/job_create.json",
+      "contentType": "application/json",
+      "parameters": [
+        {
+          "name": "JobStep",
+          "template": "templates/job_create.jobstep.json"
+        }
+      ]
+    },
+    {
+      "name": "Upload a file",
+      "description": "Upload a file",
+      "url": "/api/upload",
+      "method": "POST",
+      "template": "templates/file_upload.json",
+      "contentType": "application/json"
+    },
+    {
+      "name": "Get current weather",
+      "description": "Get current weather by location",
+      "url": "/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m",
+      "method": "GET",
+      "group": "weather"
+    },
+    {
+      "name": "Get user info",
+      "description": "Get user information by id",
+      "url": "/api/entity/user/id=<?id:1>",
+      "method": "GET"
+    },
+    {
+      "name": "Update user info",
+      "description": "Update user information by id",
+      "url": "/api/entity/user/editUser/<?id:1>",
+      "method": "POST",
+      "template": "templates/edit_user.json",
+      "contentType": "application/json"
+    },
+    {
+      "name": "Sale tax",
+      "description": "Request for sale tax",
+      "url": "/tax/sale",
+      "method": "POST",
+      "template": "templates/sale_tax.xml",
+      "contentType": "text/xml",
+      "group": "tax"
+    }
+
+  ]
+}
