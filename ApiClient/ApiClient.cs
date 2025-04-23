@@ -20,14 +20,18 @@ namespace BlueMoon.Common
             if (!Directory.Exists(LogFolder)) Directory.CreateDirectory(LogFolder); 
         }
         string _baseUrl, _locker, _key;
+        HttpClient _client = null;
         public ApiClient(string baseUrl, string locker, string key)
         {
             _baseUrl = baseUrl;
             _locker = locker;
             _key = key;
         }
+        public string BaseUrl => _baseUrl;
+        public string Locker => _locker;
         protected virtual HttpClient CreateClient()
         {
+            if (_client != null) return _client;
             var handler = new HttpClientHandler();
             if (!string.IsNullOrEmpty(_locker))
             {
@@ -38,7 +42,7 @@ namespace BlueMoon.Common
             var client = new HttpClient(handler);
             client.BaseAddress = new Uri(_baseUrl);
             client.Timeout = TimeSpan.FromSeconds(150);
-            return client;
+            return _client = client;
         }
 
         public async Task<(string data, ApiResponse apiResponse)> Execute(string path, string payload = null, string contentType = null, HttpMethod method = null, string traceId = null, [CallerMemberName] string caller = null, [CallerLineNumber] int line = 0, [CallerFilePath] string src = null)

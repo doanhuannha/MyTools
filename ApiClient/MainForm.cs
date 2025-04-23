@@ -247,10 +247,10 @@ namespace BlueMoon.ClientApp
             return data;
 
         }
+        ApiClient client = null;
         async Task<(string data, ApiResponse apiResponse)> RequestAPI(ApiEnviroment envInfo, ApiInfo apiInfo, string payloadTpl, string parameters, Action<(string requestUrl, string requestData)> onStart = null)
         {
-
-            ApiClient client = new ApiClient(envInfo.Root, envInfo.Credential?.Locker, envInfo.Credential?.Key);
+            if (client == null || client.BaseUrl != envInfo.Root || client.Locker != envInfo.Credential?.Locker) client = new ApiClient(envInfo.Root, envInfo.Credential?.Locker, envInfo.Credential?.Key);
             string requestData = null, requestUrl = apiInfo.Url;
             requestUrl = ApplyParamValues(requestUrl, parameters);
             if (!apiInfo.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
