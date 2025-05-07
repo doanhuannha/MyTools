@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlueMoon.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,6 +36,11 @@ namespace BlueMoon.ClientApp
         public string Root { get; set; }
         public string Group { get; set; }
         public Credentials Credential { get; set; }
+        public ApiClient.AuthType AuthType { get; set; }
+        public ApiEnviroment()
+        {
+            AuthType = ApiClient.AuthType.None;
+        }
     }
 
     public class ApiSettings

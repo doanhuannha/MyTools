@@ -1,39 +1,45 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.IO;
-using System.Reflection;
+using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
-namespace bluemoon.tool.db
+namespace ImportData.Services
 {
-    public class ImportDataAgent
+    public class DataService
     {
-        string _importFolder, _filePattern;
+        string[] _files;
         char _delimiter;
         byte _skipRows;
         Action<string> _log;
         int _lineCountLimited = 100, _groupCountLimited = 7;
-        public ImportDataAgent(string folderPath, string pattern = "*", char delimiter = '|', byte skipRows = 1, Action<string> log = null)
+        public DataService(string folderPath, string pattern = "*", char delimiter = '|', byte skipRows = 1, Action<string> log = null)
         {
-            _importFolder = folderPath;
-            _filePattern = pattern;
+            folderPath = folderPath.Replace("/", "\\").TrimEnd('\\') + "\\";
+            _files = Directory.GetFiles(folderPath, pattern);
+            _delimiter = delimiter;
+            _skipRows = skipRows;
+            _log = log;
+        }
+        public DataService(string[] files, char delimiter = '|', byte skipRows = 1, Action<string> log = null)
+        {
+            _files = files;
             _delimiter = delimiter;
             _skipRows = skipRows;
             _log = log;
         }
         public bool IncludeFileName { get; set; }
-        
+
         public async Task<int> Import(string connStr, string tableName, string[] columns = null, int[] dataIndices = null)
         {
-            _importFolder = _importFolder.Replace("/", "\\").TrimEnd('\\') + "\\";
-            var files = Directory.GetFiles(_importFolder, _filePattern);
             if (columns == null)
             {
-                columns = GetColumns(files[0], _delimiter);
+                columns = GetColumns(_files[0], _delimiter);
                 dataIndices = new int[columns.Length];
                 for (var i = 0; i < dataIndices.Length; i++) dataIndices[i] = i;
             }
@@ -42,9 +48,9 @@ namespace bluemoon.tool.db
                 columns = columns.Append("FileName").ToArray();
             }
             await EnsureDataTableExisting(connStr, tableName, columns);
-            Log($"Hello, import data from {_importFolder}{_filePattern}: {files.Length} file(s).");
+            Log($"Hello, Try to import: {_files.Length} file(s).");
             int totalCnt = 0;
-            foreach (var file in files)
+            foreach (var file in _files)
             {
                 FileInfo fileInfo = new FileInfo(file);
                 Log($"Processing file {fileInfo.Name}:");
@@ -119,7 +125,7 @@ namespace bluemoon.tool.db
             line = line.Replace("--", "");
             string[] data = line.Split(delimiter);
             string r = null;
-            if(includeFileName) r = $"insert into {tableName} ({string.Join(",", columns)}) values({string.Join(",", dataColIndex.Select(i => i >= data.Length ? "null" : "'" + data[i] + "'").ToArray())}, '{fileName}');";
+            if (includeFileName) r = $"insert into {tableName} ({string.Join(",", columns)}) values({string.Join(",", dataColIndex.Select(i => i >= data.Length ? "null" : "'" + data[i] + "'").ToArray())}, '{fileName}');";
             else r = $"insert into {tableName} ({string.Join(",", columns)}) values({string.Join(",", dataColIndex.Select(i => i >= data.Length ? "null" : "'" + data[i] + "'").ToArray())});";
             return r;
         }
@@ -168,10 +174,11 @@ namespace bluemoon.tool.db
                     return r == null ? default(T) : (T)r;
                 }
             }
-            
-        }
-        
 
-        
+        }
+
+
+
     }
+
 }

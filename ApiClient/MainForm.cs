@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Text.Json.Serialization;
 
 namespace BlueMoon.ClientApp
 {
@@ -137,7 +138,11 @@ namespace BlueMoon.ClientApp
         }
         private void LoadApiSettings(string settingsFile)
         {
-            _apiSettings = JsonSerializer.Deserialize<ApiSettings>(settingsFile.ReadSecuredFile(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }); ;
+            _apiSettings = JsonSerializer.Deserialize<ApiSettings>(settingsFile.ReadSecuredFile(), 
+                new JsonSerializerOptions() { 
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new JsonStringEnumConverter() }
+                }); ;
             ctrlEnv.DisplayMember = "Name";
             ctrlApi.DisplayMember = "Name";
 
@@ -250,7 +255,8 @@ namespace BlueMoon.ClientApp
         ApiClient client = null;
         async Task<(string data, ApiResponse apiResponse)> RequestAPI(ApiEnviroment envInfo, ApiInfo apiInfo, string payloadTpl, string parameters, Action<(string requestUrl, string requestData)> onStart = null)
         {
-            if (client == null || client.BaseUrl != envInfo.Root || client.Locker != envInfo.Credential?.Locker) client = new ApiClient(envInfo.Root, envInfo.Credential?.Locker, envInfo.Credential?.Key);
+            if (client == null || client.BaseUrl != envInfo.Root || client.Locker != envInfo.Credential?.Locker) 
+                client = new ApiClient(envInfo.Root, envInfo.AuthType, envInfo.Credential?.Locker, envInfo.Credential?.Key);
             string requestData = null, requestUrl = apiInfo.Url;
             requestUrl = ApplyParamValues(requestUrl, parameters);
             if (!apiInfo.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))

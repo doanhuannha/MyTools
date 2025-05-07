@@ -6,7 +6,8 @@
       "credential": {
         "locker": "dev-001",
         "key": "[protected::8f/8MTDvE90gAv3t7u/dvA==]"
-      }
+      },
+      "authType": "NTLM"
     },
     {
       "name": "PROD",
@@ -14,7 +15,8 @@
       "credential": {
         "locker": "svc-user-001",
         "key": "[protected::WUA9fV1KWj+AOzw9Kwo=]"
-      }
+      },
+      "authType": "NTLM"
     },
     {
       "name": "Tax",

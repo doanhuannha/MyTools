@@ -9,23 +9,38 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
+using static BlueMoon.Common.ApiClient;
 
 namespace BlueMoon.Common
 {
     public class ApiClient
     {
+        public enum AuthType
+        {
+            None,
+            Basic,
+            Digest,
+            NTLM,
+            Kerberos,
+            Negotiate,
+            OAuth,
+            SAML //not implemented yet
+
+        }
         const string LogFolder = "logs";
         static ApiClient()
         {
             if (!Directory.Exists(LogFolder)) Directory.CreateDirectory(LogFolder); 
         }
         string _baseUrl, _locker, _key;
+        AuthType _authType = AuthType.None;
         HttpClient _client = null;
-        public ApiClient(string baseUrl, string locker, string key)
+        public ApiClient(string baseUrl, AuthType authType = AuthType.None, string locker = null, string key = null)
         {
             _baseUrl = baseUrl;
             _locker = locker;
             _key = key;
+            _authType = authType;
         }
         public string BaseUrl => _baseUrl;
         public string Locker => _locker;
@@ -33,10 +48,18 @@ namespace BlueMoon.Common
         {
             if (_client != null) return _client;
             var handler = new HttpClientHandler();
-            if (!string.IsNullOrEmpty(_locker))
+            if (_authType != AuthType.None && !string.IsNullOrEmpty(_locker))
             {
-                handler.Credentials = new NetworkCredential(_locker, _key);
-                //handler.PreAuthenticate = true;
+                //handler.Credentials = new NetworkCredential(_locker, _key);
+                handler.Credentials = new CredentialCache
+                {
+                    {
+                        new Uri(_baseUrl), _authType.ToString(),
+                        new NetworkCredential(_locker, _key)
+                    }
+                };
+
+                handler.PreAuthenticate = true;
             }
             
             var client = new HttpClient(handler);
