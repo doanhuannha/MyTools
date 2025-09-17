@@ -23,7 +23,6 @@ namespace BlueMoon.ClientApp
         {
             this.Text = this.Text.Trim() + " - v" + Assembly.GetEntryAssembly().GetName().Version.ToString(3);
             LoadApiSettings("apis.json");
-            //Process.Start(@"C:\Users\F3X8AW3\AppData\Local\insomnia\Insomnia.exe");
         }
 
         
@@ -142,7 +141,9 @@ namespace BlueMoon.ClientApp
                 new JsonSerializerOptions() { 
                     PropertyNameCaseInsensitive = true,
                     Converters = { new JsonStringEnumConverter() }
-                }); ;
+                }
+            );
+            LoadApiSettingsExt("apidef", _apiSettings);
             ctrlEnv.DisplayMember = "Name";
             ctrlApi.DisplayMember = "Name";
 
@@ -151,6 +152,25 @@ namespace BlueMoon.ClientApp
             UpdateSelectedEnv();
             UpdateSelectedAPI();
             _loaded = true;
+        }
+        private void LoadApiSettingsExt(string folder, ApiSettings settings)
+        {
+            if (Directory.Exists(folder))
+            {
+                var allFiles = Directory.GetFiles(folder);
+                allFiles.Where(f => !f.EndsWith(".payload.json")).All(f => {
+                    var apiDef = JsonSerializer.Deserialize<ApiInfo>(f.ReadSecuredFile(),
+                        new JsonSerializerOptions()
+                        {
+                            PropertyNameCaseInsensitive = true,
+                            Converters = { new JsonStringEnumConverter() }
+                        }
+                    );
+                    settings.Apis.Add(apiDef);
+                    return true;
+                });
+            }
+            
         }
         //static Regex s_reg_Params = new Regex(@"<\?(?<k>[a-z]+\w*)(:(?<v>.*?))*>", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
         static Regex s_reg_Params = new Regex(@"<\?(?<k>[a-z]+\w*)(:(?<v>.*?))?>", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
