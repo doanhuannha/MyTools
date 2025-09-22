@@ -4,14 +4,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace EncodeFile.Services
 {
+    
+
     public class FileService : IFileService
     {
-
-
         public FileDetail EncodeFile(string filePath)
         {
             FileDetail file = new FileDetail() { FilePath = filePath };
@@ -30,34 +32,41 @@ namespace EncodeFile.Services
             else if (detail.FileContent != null) File.WriteAllBytes(detail.FilePath, detail.FileContent);
             return true;
         }
-        static string ToBase64File(string filePath)
+        static string ToBase64File(string filePath, bool largeFile = false)
         {
-            StringBuilder sb = new StringBuilder();
-            FileStream inStream = new FileStream(filePath, FileMode.Open);
-            byte[] buf = new byte[1024];
-            int readByte = 0;
-            while ((readByte = inStream.Read(buf, 0, buf.Length)) > 0)
+            if (largeFile)
             {
-                sb.AppendLine(Convert.ToBase64String(buf, 0, readByte));
+                StringBuilder sb = new StringBuilder();
+                FileStream inStream = new FileStream(filePath, FileMode.Open);
+                byte[] buf = new byte[1024];
+                int readByte = 0;
+                while ((readByte = inStream.Read(buf, 0, buf.Length)) > 0)
+                {
+                    sb.AppendLine(Convert.ToBase64String(buf, 0, readByte));
+                }
+                inStream.Close();
+                return sb.ToString();
             }
-            inStream.Close();
-            return sb.ToString();
+            else return Convert.ToBase64String(File.ReadAllBytes(filePath));
         }
-        static byte[] FromBase64File(string filePath)
+        static byte[] FromBase64File(string filePath, bool largeFile = false)
         {
-            MemoryStream outStream = new MemoryStream();
-            StreamReader inStream = new StreamReader(filePath);
-            byte[] buf = new byte[1024];
-            string line;
-            while ((line = inStream.ReadLine()) != null)
+            if (largeFile)
             {
-                outStream.Write(Convert.FromBase64String(line));
+                MemoryStream outStream = new MemoryStream();
+                StreamReader inStream = new StreamReader(filePath);
+                byte[] buf = new byte[1024];
+                string line;
+                while ((line = inStream.ReadLine()) != null)
+                {
+                    outStream.Write(Convert.FromBase64String(line));
+                }
+                inStream.Close();
+                byte[] result = outStream.ToArray();
+                outStream.Close();
+                return result;
             }
-            inStream.Close();
-            byte[] result = outStream.ToArray();
-            outStream.Close();
-            return result;
-
+            else return Convert.FromBase64String(File.ReadAllText(filePath));
         }
     }
 }
