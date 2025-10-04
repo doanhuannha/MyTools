@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             layoutButtons = new FlowLayoutPanel();
             ctrlSubmit = new Button();
@@ -42,7 +43,6 @@
             ctrlMethod = new Label();
             ctrlURL = new TextBox();
             label4 = new Label();
-            ctrlResponseInfo = new Label();
             label8 = new Label();
             label7 = new Label();
             ctrlEnv = new ComboBox();
@@ -54,10 +54,17 @@
             label5 = new Label();
             ctrlResponseData = new TextBox();
             layoutMain = new TableLayoutPanel();
+            ctrlResponseInfo = new Label();
+            layoutResponse = new TableLayoutPanel();
+            ctrlGridHeaders = new DataGridView();
+            dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
             layoutButtons.SuspendLayout();
             layoutRequest.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)ctrlGridParams).BeginInit();
             layoutMain.SuspendLayout();
+            layoutResponse.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)ctrlGridHeaders).BeginInit();
             SuspendLayout();
             // 
             // layoutButtons
@@ -66,20 +73,20 @@
             layoutButtons.Controls.Add(ctrlMultipleRun);
             layoutButtons.Dock = DockStyle.Fill;
             layoutButtons.FlowDirection = FlowDirection.RightToLeft;
-            layoutButtons.Location = new Point(88, 320);
+            layoutButtons.Location = new Point(88, 313);
             layoutButtons.Margin = new Padding(0);
             layoutButtons.Name = "layoutButtons";
-            layoutButtons.Size = new Size(811, 30);
+            layoutButtons.Size = new Size(813, 30);
             layoutButtons.TabIndex = 16;
             // 
             // ctrlSubmit
             // 
             ctrlSubmit.Anchor = AnchorStyles.None;
             ctrlSubmit.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            ctrlSubmit.Location = new Point(728, 2);
+            ctrlSubmit.Location = new Point(730, 2);
             ctrlSubmit.Margin = new Padding(3, 2, 3, 2);
             ctrlSubmit.Name = "ctrlSubmit";
-            ctrlSubmit.Size = new Size(80, 26);
+            ctrlSubmit.Size = new Size(80, 25);
             ctrlSubmit.TabIndex = 12;
             ctrlSubmit.Text = "&Preview";
             ctrlSubmit.UseVisualStyleBackColor = true;
@@ -88,10 +95,10 @@
             // ctrlMultipleRun
             // 
             ctrlMultipleRun.Anchor = AnchorStyles.None;
-            ctrlMultipleRun.Location = new Point(586, 2);
+            ctrlMultipleRun.Location = new Point(588, 2);
             ctrlMultipleRun.Margin = new Padding(3, 2, 3, 2);
             ctrlMultipleRun.Name = "ctrlMultipleRun";
-            ctrlMultipleRun.Size = new Size(136, 26);
+            ctrlMultipleRun.Size = new Size(136, 25);
             ctrlMultipleRun.TabIndex = 13;
             ctrlMultipleRun.Text = "&Multiple requests";
             ctrlMultipleRun.UseVisualStyleBackColor = true;
@@ -100,8 +107,8 @@
             // layoutRequest
             // 
             layoutRequest.ColumnCount = 2;
-            layoutRequest.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 66.66666F));
-            layoutRequest.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33333F));
+            layoutRequest.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 67F));
+            layoutRequest.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
             layoutRequest.Controls.Add(ctrlRequestData, 0, 0);
             layoutRequest.Controls.Add(ctrlGridParams, 1, 0);
             layoutRequest.Dock = DockStyle.Fill;
@@ -110,7 +117,7 @@
             layoutRequest.Name = "layoutRequest";
             layoutRequest.RowCount = 1;
             layoutRequest.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            layoutRequest.Size = new Size(805, 151);
+            layoutRequest.Size = new Size(807, 144);
             layoutRequest.TabIndex = 15;
             // 
             // ctrlRequestData
@@ -122,7 +129,7 @@
             ctrlRequestData.Multiline = true;
             ctrlRequestData.Name = "ctrlRequestData";
             ctrlRequestData.ScrollBars = ScrollBars.Vertical;
-            ctrlRequestData.Size = new Size(530, 147);
+            ctrlRequestData.Size = new Size(534, 140);
             ctrlRequestData.TabIndex = 9;
             // 
             // ctrlGridParams
@@ -134,13 +141,13 @@
             ctrlGridParams.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             ctrlGridParams.Columns.AddRange(new DataGridViewColumn[] { Column1, Column2, Browse });
             ctrlGridParams.Dock = DockStyle.Fill;
-            ctrlGridParams.Location = new Point(539, 2);
+            ctrlGridParams.Location = new Point(543, 2);
             ctrlGridParams.Margin = new Padding(3, 2, 3, 2);
             ctrlGridParams.Name = "ctrlGridParams";
             ctrlGridParams.RowHeadersVisible = false;
             ctrlGridParams.RowHeadersWidth = 51;
             ctrlGridParams.RowTemplate.Height = 29;
-            ctrlGridParams.Size = new Size(263, 147);
+            ctrlGridParams.Size = new Size(261, 140);
             ctrlGridParams.TabIndex = 17;
             ctrlGridParams.CellContentClick += ctrlGridParams_CellContentClick;
             // 
@@ -188,7 +195,7 @@
             ctrlURL.Margin = new Padding(3, 2, 3, 2);
             ctrlURL.Name = "ctrlURL";
             ctrlURL.ReadOnly = true;
-            ctrlURL.Size = new Size(805, 16);
+            ctrlURL.Size = new Size(807, 16);
             ctrlURL.TabIndex = 8;
             ctrlURL.Text = "[URL]";
             // 
@@ -203,24 +210,13 @@
             label4.Text = "URL";
             label4.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // ctrlResponseInfo
-            // 
-            ctrlResponseInfo.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
-            ctrlResponseInfo.AutoSize = true;
-            ctrlResponseInfo.Location = new Point(91, 505);
-            ctrlResponseInfo.Name = "ctrlResponseInfo";
-            ctrlResponseInfo.Size = new Size(16, 30);
-            ctrlResponseInfo.TabIndex = 13;
-            ctrlResponseInfo.Text = "...";
-            ctrlResponseInfo.TextAlign = ContentAlignment.MiddleLeft;
-            // 
             // label8
             // 
             label8.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             label8.AutoSize = true;
-            label8.Location = new Point(28, 350);
+            label8.Location = new Point(28, 343);
             label8.Name = "label8";
-            label8.Size = new Size(57, 155);
+            label8.Size = new Size(57, 148);
             label8.TabIndex = 11;
             label8.Text = "Response";
             // 
@@ -230,7 +226,7 @@
             label7.AutoSize = true;
             label7.Location = new Point(36, 165);
             label7.Name = "label7";
-            label7.Size = new Size(49, 155);
+            label7.Size = new Size(49, 148);
             label7.TabIndex = 8;
             label7.Text = "Request";
             // 
@@ -242,7 +238,7 @@
             ctrlEnv.Location = new Point(91, 18);
             ctrlEnv.Margin = new Padding(3, 2, 3, 2);
             ctrlEnv.Name = "ctrlEnv";
-            ctrlEnv.Size = new Size(805, 23);
+            ctrlEnv.Size = new Size(807, 23);
             ctrlEnv.TabIndex = 1;
             ctrlEnv.SelectedIndexChanged += ctrlEnv_SelectedIndexChanged;
             // 
@@ -276,7 +272,7 @@
             ctrlApi.Location = new Point(91, 48);
             ctrlApi.Margin = new Padding(3, 2, 3, 2);
             ctrlApi.Name = "ctrlApi";
-            ctrlApi.Size = new Size(805, 23);
+            ctrlApi.Size = new Size(807, 23);
             ctrlApi.TabIndex = 3;
             ctrlApi.SelectedIndexChanged += ctrlApi_SelectedIndexChanged;
             // 
@@ -317,13 +313,13 @@
             // 
             ctrlResponseData.BorderStyle = BorderStyle.FixedSingle;
             ctrlResponseData.Dock = DockStyle.Fill;
-            ctrlResponseData.Location = new Point(91, 352);
+            ctrlResponseData.Location = new Point(3, 2);
             ctrlResponseData.Margin = new Padding(3, 2, 3, 2);
             ctrlResponseData.Multiline = true;
             ctrlResponseData.Name = "ctrlResponseData";
             ctrlResponseData.ReadOnly = true;
             ctrlResponseData.ScrollBars = ScrollBars.Vertical;
-            ctrlResponseData.Size = new Size(805, 151);
+            ctrlResponseData.Size = new Size(536, 140);
             ctrlResponseData.TabIndex = 10;
             // 
             // layoutMain
@@ -331,8 +327,7 @@
             layoutMain.ColumnCount = 3;
             layoutMain.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 88F));
             layoutMain.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            layoutMain.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 9F));
-            layoutMain.Controls.Add(ctrlResponseData, 1, 8);
+            layoutMain.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 8F));
             layoutMain.Controls.Add(label5, 0, 5);
             layoutMain.Controls.Add(ctrlDesc, 1, 3);
             layoutMain.Controls.Add(label3, 0, 3);
@@ -348,6 +343,7 @@
             layoutMain.Controls.Add(layoutRequest, 1, 6);
             layoutMain.Controls.Add(layoutButtons, 1, 7);
             layoutMain.Controls.Add(ctrlEnv, 1, 1);
+            layoutMain.Controls.Add(layoutResponse, 1, 8);
             layoutMain.Dock = DockStyle.Fill;
             layoutMain.Location = new Point(0, 0);
             layoutMain.Margin = new Padding(3, 2, 3, 2);
@@ -363,20 +359,85 @@
             layoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
             layoutMain.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             layoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
-            layoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 8F));
-            layoutMain.Size = new Size(908, 543);
+            layoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 7F));
+            layoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 12F));
+            layoutMain.Size = new Size(909, 529);
             layoutMain.TabIndex = 0;
+            // 
+            // ctrlResponseInfo
+            // 
+            ctrlResponseInfo.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            ctrlResponseInfo.AutoSize = true;
+            ctrlResponseInfo.Location = new Point(91, 491);
+            ctrlResponseInfo.Name = "ctrlResponseInfo";
+            ctrlResponseInfo.Size = new Size(16, 30);
+            ctrlResponseInfo.TabIndex = 13;
+            ctrlResponseInfo.Text = "...";
+            ctrlResponseInfo.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // layoutResponse
+            // 
+            layoutResponse.ColumnCount = 2;
+            layoutResponse.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 67F));
+            layoutResponse.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
+            layoutResponse.Controls.Add(ctrlGridHeaders, 1, 0);
+            layoutResponse.Controls.Add(ctrlResponseData, 0, 0);
+            layoutResponse.Dock = DockStyle.Fill;
+            layoutResponse.Location = new Point(90, 345);
+            layoutResponse.Margin = new Padding(2, 2, 2, 2);
+            layoutResponse.Name = "layoutResponse";
+            layoutResponse.RowCount = 1;
+            layoutResponse.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            layoutResponse.Size = new Size(809, 144);
+            layoutResponse.TabIndex = 17;
+            // 
+            // ctrlGridHeaders
+            // 
+            ctrlGridHeaders.AllowUserToAddRows = false;
+            ctrlGridHeaders.AllowUserToDeleteRows = false;
+            ctrlGridHeaders.AllowUserToResizeRows = false;
+            ctrlGridHeaders.BackgroundColor = SystemColors.Control;
+            ctrlGridHeaders.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            ctrlGridHeaders.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn1, dataGridViewTextBoxColumn2 });
+            ctrlGridHeaders.Dock = DockStyle.Fill;
+            ctrlGridHeaders.Location = new Point(545, 2);
+            ctrlGridHeaders.Margin = new Padding(3, 2, 3, 2);
+            ctrlGridHeaders.Name = "ctrlGridHeaders";
+            ctrlGridHeaders.RowHeadersVisible = false;
+            ctrlGridHeaders.RowHeadersWidth = 51;
+            ctrlGridHeaders.RowTemplate.Height = 29;
+            ctrlGridHeaders.Size = new Size(261, 140);
+            ctrlGridHeaders.TabIndex = 18;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            dataGridViewCellStyle2.BackColor = Color.FromArgb(224, 224, 224);
+            dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewTextBoxColumn1.Frozen = true;
+            dataGridViewTextBoxColumn1.HeaderText = "Header";
+            dataGridViewTextBoxColumn1.MinimumWidth = 6;
+            dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            dataGridViewTextBoxColumn1.ReadOnly = true;
+            dataGridViewTextBoxColumn1.Width = 125;
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            dataGridViewTextBoxColumn2.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewTextBoxColumn2.HeaderText = "Value";
+            dataGridViewTextBoxColumn2.MinimumWidth = 6;
+            dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            dataGridViewTextBoxColumn2.ReadOnly = true;
             // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(908, 543);
+            ClientSize = new Size(909, 529);
             Controls.Add(layoutMain);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(3, 2, 3, 2);
             Name = "Main";
-            Text = "API Client";
+            Text = "Api Client";
             Load += Main_Load;
             layoutButtons.ResumeLayout(false);
             layoutRequest.ResumeLayout(false);
@@ -384,6 +445,9 @@
             ((System.ComponentModel.ISupportInitialize)ctrlGridParams).EndInit();
             layoutMain.ResumeLayout(false);
             layoutMain.PerformLayout();
+            layoutResponse.ResumeLayout(false);
+            layoutResponse.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)ctrlGridHeaders).EndInit();
             ResumeLayout(false);
         }
 
@@ -396,7 +460,6 @@
         private Label ctrlMethod;
         private TextBox ctrlURL;
         private Label label4;
-        private Label ctrlResponseInfo;
         private Label label8;
         private Label label7;
         private ComboBox ctrlEnv;
@@ -413,5 +476,10 @@
         private DataGridViewTextBoxColumn Column1;
         private DataGridViewTextBoxColumn Column2;
         private DataGridViewButtonColumn Browse;
+        private TableLayoutPanel layoutResponse;
+        private DataGridView ctrlGridHeaders;
+        private Label ctrlResponseInfo;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
     }
 }

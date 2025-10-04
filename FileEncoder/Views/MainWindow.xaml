@@ -1,0 +1,25 @@
+﻿<res:BaseWindow x:Class="EncodeFile.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EncodeFile.Views"
+        xmlns:res="clr-namespace:EncodeFile.Helpers" 
+        xmlns:viewmodel="clr-namespace:EncodeFile.ViewModels" 
+        xmlns:uc="clr-namespace:EncodeFile.Views.UCs"
+        d:DataContext="{d:DesignInstance Type=viewmodel:MainModel}"
+        mc:Ignorable="d"
+        Title="File tools" Height="333" Width="555"
+        EnableBindingProxy="False"
+        >
+    <Grid>
+        <TabControl Margin="5">
+        <TabItem Header="Base 64">
+                <uc:Base64Panel Model="{Binding ViewModel.B64}" />
+        </TabItem>
+        <TabItem Header="Pdf">
+                <uc:PdfPanel Model="{Binding ViewModel.Pdf}" />
+        </TabItem>
+    </TabControl>
+    </Grid>
+</res:BaseWindow>

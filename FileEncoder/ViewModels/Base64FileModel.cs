@@ -16,10 +16,10 @@ using System.Windows.Input;
 
 namespace EncodeFile.ViewModels
 {
-    public class EncodeFileViewModel: BaseViewModel
+    public class Base64FileModel: BaseViewModel
     {
-
-        IFileService _fileService = null;
+        
+        IBase64Service _fileService = null;
         private string _filePath;
         public string FilePath
         {
@@ -49,7 +49,7 @@ namespace EncodeFile.ViewModels
 
         public ICommand ActionCommand { get; }
         
-        public EncodeFileViewModel(IFileService fileService)
+        public Base64FileModel(IBase64Service fileService)
         {
             SelectFileCommand = new RelayCommand(SelectFile);
             ActionCommand = new RelayCommand(Action, HasFile);
@@ -93,7 +93,6 @@ namespace EncodeFile.ViewModels
         async void Action(object _)
         {
             IsProcessing = true;
-
             await Task.Run(() =>
             {
                 switch (FileMode)

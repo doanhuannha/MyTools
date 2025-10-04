@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace EncodeFile.Helpers
 {
-    public abstract class BaseViewModel: INotifyPropertyChanged
+    public abstract class BaseViewModel : INotifyPropertyChanged
     {
-
+        public BaseViewModel Parent { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
@@ -26,8 +26,8 @@ namespace EncodeFile.Helpers
         private bool _isProcessing = false;
         public bool IsProcessing
         {
-            get => _isProcessing;
-            set => SetProperty(ref _isProcessing, value);
+            get => Parent == null ? _isProcessing : Parent.IsProcessing;
+            set { if (Parent == null) SetProperty(ref _isProcessing, value); else Parent.IsProcessing = value; }
         }
 
 

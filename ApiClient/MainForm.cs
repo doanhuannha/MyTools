@@ -146,7 +146,7 @@ namespace BlueMoon.ClientApp
             LoadApiSettingsExt("apidef", _apiSettings);
             ctrlEnv.DisplayMember = "Name";
             ctrlApi.DisplayMember = "Name";
-
+            _apiSettings.Apis = _apiSettings.Apis.OrderBy(p=>p.Name).ToList();
             ctrlEnv.DataSource = _apiSettings.Enviroments;
 
             UpdateSelectedEnv();
@@ -166,6 +166,7 @@ namespace BlueMoon.ClientApp
                             Converters = { new JsonStringEnumConverter() }
                         }
                     );
+					apiDef.Template = folder + "/" + apiDef.Template;
                     settings.Apis.Add(apiDef);
                     return true;
                 });
@@ -277,6 +278,11 @@ namespace BlueMoon.ClientApp
         {
             if (client == null || client.BaseUrl != envInfo.Root || client.Locker != envInfo.Credential?.Locker) 
                 client = new ApiClient(envInfo.Root, envInfo.AuthType, envInfo.Credential?.Locker, envInfo.Credential?.Key);
+			if (envInfo.EntraCredential != null)
+            {
+                var cred = envInfo.EntraCredential;
+                client.TokenPool = new EntraIdTokenManager(cred.Tenant, cred.Client, cred.Charm, cred.Scope);
+            }
             string requestData = null, requestUrl = apiInfo.Url;
             requestUrl = ApplyParamValues(requestUrl, parameters);
             if (!apiInfo.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
@@ -291,7 +297,7 @@ namespace BlueMoon.ClientApp
             if (onStart != null) onStart((requestUrl, requestData));
             return await client.Execute(requestUrl, requestData, apiInfo.ContentType, new HttpMethod(apiInfo.Method));
         }
-        async Task SingleRequestAPI(ApiEnviroment envInfo, ApiInfo apiInfo, string paremters)
+        async Task SingleRequestAPI(ApiEnviroment envInfo, ApiInfo apiInfo, string paremters,int count = 0)
         {
             layoutMain.Enabled = false;
             ctrlResponseInfo.Text = "...";
@@ -309,7 +315,8 @@ namespace BlueMoon.ClientApp
                     await Task.Delay(1000);
                     Invoke(() =>
                     {
-                        ctrlResponseData.Text = $"Requesting... {++cnt}(s)";
+                        if (count > 0) ctrlResponseData.Text = $"Requesting #{count}... {++cnt}(s)";
+                        else ctrlResponseData.Text = $"Requesting... {++cnt}(s)";
                     });
                 }
                 Invoke(() =>
@@ -318,9 +325,19 @@ namespace BlueMoon.ClientApp
                 });
 
             });
+            ctrlResponseData.Text = $"Requesting...";
             result = await RequestAPI(envInfo, apiInfo, payloadTpl, paremters, (arg) => {
                 ctrlResponseInfo.Text = $"{apiInfo.Method} {envInfo.Root}{arg.requestUrl}";
             });
+
+            //populate headers
+            ctrlGridHeaders.Rows.Clear();
+            var headers = result.apiResponse.Headers.SelectMany(hh=>hh.Value.Select(SingleValue=> (hh.Key, SingleValue)).ToList());
+            foreach (var header in headers)
+            {
+                ctrlGridHeaders.Rows.Add(header.Key, header.SingleValue);
+            }
+
             ctrlRequestData.ReadOnly = false;
             var response = result.apiResponse;
             string elapsedTime = response.ElapsedTime < 0 ? "Timeout" : response.ElapsedTime < 10000 ? $"{response.ElapsedTime.ToString("0.##")}(ms)" : $"{(response.ElapsedTime / 1000).ToString("0.##")}(s)";

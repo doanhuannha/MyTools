@@ -82,13 +82,12 @@ public static class UIExtensions
         //window.Content = container;
         if (!root.Children.Contains(container))
         {
-            if(root is Grid grid)
+            if (root is Grid grid)
             {
                 Grid.SetColumn(container, 0);
-                Grid.SetColumnSpan(container, grid.ColumnDefinitions.Count);
-                
+                if (grid.ColumnDefinitions.Count > 0) Grid.SetColumnSpan(container, grid.ColumnDefinitions.Count);
                 Grid.SetRow(container, 0);
-                Grid.SetRowSpan(container, grid.RowDefinitions.Count);
+                if (grid.RowDefinitions.Count > 0) Grid.SetRowSpan(container, grid.RowDefinitions.Count);
 
             }
             root.Children.Add(container);

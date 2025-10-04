@@ -10,7 +10,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using EncodeFile.Helpers;
 
 namespace EncodeFile.Views;
 
@@ -19,18 +18,16 @@ namespace EncodeFile.Views;
 /// </summary>
 partial class MainWindow : BaseWindow
 {
-    public MainWindow(EncodeFileViewModel model)
+    public MainWindow(MainModel model)
     {
         InitializeComponent();
-
-
         // Set the DataContext for the Window
         //DataContext = model;
         DataContext = new
         {
-            MyModel = model
+            ViewModel = model
         };
-        this.InitLoadingControl("MyModel.IsProcessing");
+        this.InitLoadingControl("ViewModel.IsProcessing");
     }
 
 }

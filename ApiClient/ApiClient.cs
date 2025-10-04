@@ -15,6 +15,10 @@ namespace BlueMoon.Common
 {
     public class ApiClient
     {
+        public interface IBearerTokenPool
+        {
+            Task<string> GetToken();
+        }
         public enum AuthType
         {
             None,
@@ -35,12 +39,19 @@ namespace BlueMoon.Common
         string _baseUrl, _locker, _key;
         AuthType _authType = AuthType.None;
         HttpClient _client = null;
-        public ApiClient(string baseUrl, AuthType authType = AuthType.None, string locker = null, string key = null)
+        IBearerTokenPool _tokenPool;
+        public ApiClient(string baseUrl, AuthType authType = AuthType.None, string locker = null, string key = null, IBearerTokenPool tokenPool = null)
         {
             _baseUrl = baseUrl;
             _locker = locker;
             _key = key;
             _authType = authType;
+            _tokenPool = tokenPool;
+        }
+        public IBearerTokenPool TokenPool
+        {
+            get { return _tokenPool; }
+            set { _tokenPool = value; }
         }
         public string BaseUrl => _baseUrl;
         public string Locker => _locker;
@@ -60,6 +71,7 @@ namespace BlueMoon.Common
                 };
 
                 handler.PreAuthenticate = true;
+                handler.AllowAutoRedirect = false;
             }
             
             var client = new HttpClient(handler);
@@ -72,7 +84,11 @@ namespace BlueMoon.Common
         {
             if (string.IsNullOrEmpty(traceId)) traceId = Guid.NewGuid().ToString();
             var client = CreateClient();
-
+            if (_tokenPool != null)
+            {
+                string token = await _tokenPool.GetToken();
+                if (!string.IsNullOrEmpty(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
             HttpRequestMessage request = new HttpRequestMessage();
             request.RequestUri = new Uri(client.BaseAddress, path);
             HttpResponseMessage response = null;
@@ -97,11 +113,12 @@ namespace BlueMoon.Common
             try
             {
                 
-                response = await client.SendAsync(request);
+                response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
                 apiResponse.CompletedRequestTime = DateTime.Now;
                 if (response != null) using (response)
                 {
                     apiResponse.HttpCode = (int)response.StatusCode;
+                    apiResponse.Headers = response.Headers.Concat(response.Content == null ? Enumerable.Empty<KeyValuePair<string, IEnumerable<string>>>() : response.Content.Headers).ToList();
                     responseData = await response.Content.ReadAsStringAsync();
                 }
                 else
@@ -154,10 +171,71 @@ Trace: Excuted from method {caller} at line {line} of {src};
 
     public class ApiResponse
     {
+        public List<KeyValuePair<string, IEnumerable<string>>> Headers { get; set; }
         public int HttpCode { get; set; }
         public string ErrorMessage { get; set; }
         public DateTime BeginRequestTime { get; set; }
         public DateTime CompletedRequestTime { get; set; }
         public double ElapsedTime { get { return CompletedRequestTime.Subtract(BeginRequestTime).TotalMilliseconds; } }
+    }
+    public class EntraIdTokenManager : IBearerTokenPool
+    {
+
+        static Dictionary<string, (string token, DateTime expiredTime)> s_Token_Pool = new Dictionary<string, (string token, DateTime expiredTime)>();
+
+        private string _tenantId, _clientId, _charm, _scope, _id;
+        public EntraIdTokenManager(string tenantId,
+            string clientId,
+            string charm,
+            string scope)
+        {
+            _tenantId = tenantId;
+            _clientId = clientId;
+            _charm = charm;
+            _scope = scope;
+            _id = $"{_tenantId}_{_clientId}_{_scope}";
+        }
+
+        async Task<(string token, DateTime expiredTime)> GetAccessTokenAsync()
+        {
+            var tokenEndpoint = $"https://login.microsoftonline.com/{_tenantId}/oauth2/v2.0/token";
+            var content = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("client_id", _clientId),
+                new KeyValuePair<string, string>("scope", _scope),
+                new KeyValuePair<string, string>("client_secret", _charm),
+                new KeyValuePair<string, string>("grant_type", "client_credentials")
+            });
+            HttpClient httpClient = new HttpClient();
+            var response = await httpClient.PostAsync(tokenEndpoint, content);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+                string token = doc.RootElement.GetProperty("access_token").GetString();
+                int expiresIn = doc.RootElement.GetProperty("expires_in").GetInt32();
+                DateTime expiresAt = DateTime.UtcNow.AddSeconds(expiresIn - 30);//refresh token 30s in advance
+                return (token, expiresAt);
+            }
+            else return default;
+
+        }
+
+        public async Task<string> GetToken()
+        {
+            if (s_Token_Pool.ContainsKey(_id))
+            {
+                var currentTokenInfo = s_Token_Pool[_id];
+                if (currentTokenInfo.expiredTime > DateTime.UtcNow) return currentTokenInfo.token;
+                else lock (s_Token_Pool) { s_Token_Pool.Remove(_id); }
+            }
+            //refresh key
+            var tokenInfo = await GetAccessTokenAsync();
+            if (tokenInfo == default) return null;
+            lock (s_Token_Pool) { s_Token_Pool.Add(_id, tokenInfo); }
+            return tokenInfo.token;
+
+
+        }
     }
 }

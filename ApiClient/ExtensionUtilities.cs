@@ -87,14 +87,19 @@ namespace BlueMoon.Common
         }
         static Regex s_reg_SensitiveValues = new Regex(@"<<(.*?)>>", RegexOptions.Singleline | RegexOptions.Compiled);
         static Regex s_reg_ProtectedValues = new Regex(@"\[protected::(.*?)\]", RegexOptions.Singleline | RegexOptions.Compiled);
-        
+
         public static string ReadSecuredFile(this string jsonFilePath)
         {
             var s = File.ReadAllText(jsonFilePath);
-            string ss = s_reg_SensitiveValues.Replace(s, m => $"{m.Groups[1].Value.ProtectValue()}");
+            string ss = s_reg_SensitiveValues.Replace(s, m => $"{m.Groups[1].Value.ProtectValue().JsonDecode()}");
             if (ss.Length > s.Length) File.WriteAllText(jsonFilePath, ss);
-            s = s_reg_ProtectedValues.Replace(ss, m => $"{m.Value.ReadProtectedValue()}");
+            s = s_reg_ProtectedValues.Replace(ss, m => $"{JsonEncodedText.Encode(m.Value.ReadProtectedValue())}");
             return s;
+        }
+        static string JsonDecode(this string encoded)
+        {
+            if (string.IsNullOrEmpty(encoded)) return encoded;
+            return JsonSerializer.Deserialize<string>($"\"{encoded}\"");
         }
     }
 }

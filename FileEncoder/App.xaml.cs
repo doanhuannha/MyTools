@@ -16,8 +16,11 @@ public partial class App : Application
     private ServiceProvider _serviceProvider;
     private void ConfigureServices(IServiceCollection services)
     {
-        services.AddSingleton<IFileService, FileService>();
-        services.AddSingleton<EncodeFileViewModel>();
+        services.AddSingleton<IBase64Service, Base64Service>();
+        services.AddSingleton<IPdfService, PdfService>();
+        services.AddSingleton<MainModel>();
+        services.AddSingleton<Base64FileModel>();
+        services.AddSingleton<PdfFileModel>();
         services.AddSingleton<MainWindow>();
     }
     protected override void OnStartup(StartupEventArgs e)

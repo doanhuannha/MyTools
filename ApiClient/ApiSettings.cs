@@ -29,6 +29,13 @@ namespace BlueMoon.ClientApp
         public string Locker { get; set; }
         public string Key { get; set; }
     }
+    public class EntraIdCredentialInfo
+    {
+        public string Tenant { get; set; }
+        public string Client { get; set; }
+        public string Charm { get; set; }
+        public string Scope { get; set; }
+    }
 
     public class ApiEnviroment
     {
@@ -37,6 +44,8 @@ namespace BlueMoon.ClientApp
         public string Group { get; set; }
         public Credentials Credential { get; set; }
         public ApiClient.AuthType AuthType { get; set; }
+
+        public EntraIdCredentialInfo EntraCredential { get; set; }
         public ApiEnviroment()
         {
             AuthType = ApiClient.AuthType.None;
